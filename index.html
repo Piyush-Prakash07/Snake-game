@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Arcade Edition - Next-Gen Web Snake</title>
+    <meta name="description" content="Play the modern cyber-themed Snake arcade game with custom skins, progressive speeds, golden bonus apples, and synth audio.">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- TOP HUD HEADER -->
+        <header class="header-bar" id="mainHeader">
+            <div class="logo-area">
+                <h1 class="game-title" id="gameTitle">SNAKE</h1>
+                <span class="edition-badge" id="editionBadge">Arcade Edition</span>
+            </div>
+
+            <div class="hud-stats">
+                <div class="powerup-badge" id="powerUpBadge"></div>
+                <div class="stat-box">
+                    <span class="stat-label">Score</span>
+                    <span class="stat-val score" id="scoreVal">0</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">★ High Score</span>
+                    <span class="stat-val high" id="highScoreVal">0</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">Speed</span>
+                    <span class="stat-val" id="speedVal">Lv. 1</span>
+                </div>
+            </div>
+
+            <div class="hud-actions">
+                <button class="icon-btn" id="musicBtn" title="Toggle Synth BGM (B)" aria-label="Toggle Music">
+                    <span id="musicIcon">🎶</span>
+                </button>
+                <button class="icon-btn" id="soundBtn" title="Toggle Sound FX (M)" aria-label="Toggle Sound">
+                    <span id="soundIcon">🔊</span>
+                </button>
+                <button class="icon-btn" id="pauseBtn" title="Pause Game (P / Space)" aria-label="Pause Game">
+                    <span>⏸</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- MAIN LAYOUT -->
+        <main class="game-layout">
+            <!-- CANVAS ARENA WRAPPER -->
+            <div class="canvas-wrapper">
+                <!-- Golden Apple Progress Bar -->
+                <div class="bonus-timer-container" id="bonusTimerContainer">
+                    <div class="bonus-progress-bar" id="bonusProgressBar"></div>
+                </div>
+
+                <canvas id="gameCanvas" width="600" height="600"></canvas>
+
+                <!-- START SCREEN OVERLAY -->
+                <div class="canvas-overlay" id="startOverlay">
+                    <h2 class="overlay-title neon">SNAKE</h2>
+                    <p class="overlay-subtitle">Collect glowing apples, unlock high speeds & survive!</p>
+                    <button class="primary-btn" id="startPlayBtn">PLAY NOW</button>
+                    <p class="key-hint">Press <span class="key-badge">SPACE</span> or Click to Start</p>
+                </div>
+
+                <!-- PAUSE SCREEN OVERLAY -->
+                <div class="canvas-overlay hidden" id="pauseOverlay">
+                    <h2 class="overlay-title neon">PAUSED</h2>
+                    <p class="overlay-subtitle">Game is temporarily suspended</p>
+                    <button class="primary-btn" id="resumeBtn">RESUME</button>
+                    <p class="key-hint">Press <span class="key-badge">SPACE</span> or <span class="key-badge">P</span> to Resume</p>
+                </div>
+
+                <!-- GAME OVER OVERLAY -->
+                <div class="canvas-overlay hidden" id="gameOverOverlay">
+                    <h2 class="overlay-title alert">GAME OVER</h2>
+                    <div class="record-banner" id="newRecordBadge">★ NEW HIGH SCORE RECORD! ★</div>
+
+                    <div class="game-stats-grid">
+                        <div class="game-stat-card">
+                            <div class="label">Final Score</div>
+                            <div class="val" id="finalScoreVal">0</div>
+                        </div>
+                        <div class="game-stat-card">
+                            <div class="label">Time Survived</div>
+                            <div class="val" id="finalTimeVal">0s</div>
+                        </div>
+                        <div class="game-stat-card">
+                            <div class="label">Foods Eaten</div>
+                            <div class="val" id="finalFoodVal">0</div>
+                        </div>
+                    </div>
+
+                    <button class="primary-btn" id="playAgainBtn">PLAY AGAIN</button>
+                    <p class="key-hint">Press <span class="key-badge">SPACE</span> to Restart</p>
+                </div>
+            </div>
+
+            <!-- SIDEBAR SETTINGS & INFO -->
+            <aside class="sidebar-panel">
+                <!-- DIFFICULTY SETTING -->
+                <div class="panel-card">
+                    <div class="panel-title"><span>⚡</span> Difficulty</div>
+                    <div class="option-grid">
+                        <button class="option-btn difficulty-btn" data-diff="easy" id="diffEasy">🟢 Easy</button>
+                        <button class="option-btn difficulty-btn active" data-diff="normal" id="diffNormal">🟡 Normal</button>
+                        <button class="option-btn difficulty-btn" data-diff="hard" id="diffHard">🔴 Hard</button>
+                        <button class="option-btn difficulty-btn" data-diff="insane" id="diffInsane">⚡ Insane</button>
+                    </div>
+                </div>
+
+                <!-- GAME MODE SETTING -->
+                <div class="panel-card">
+                    <div class="panel-title"><span>🌀</span> Game Mode</div>
+                    <div class="option-grid">
+                        <button class="option-btn mode-btn active" data-mode="classic" id="modeClassic">🧱 Classic Walls</button>
+                        <button class="option-btn mode-btn" data-mode="wrap" id="modeWrap">🌀 Wrap-Around</button>
+                    </div>
+                </div>
+
+                <!-- SNAKE SKINS -->
+                <div class="panel-card">
+                    <div class="panel-title"><span>🎨</span> Snake Skins</div>
+                    <div class="skin-grid">
+                        <button class="skin-btn active" data-skin="emerald" id="skinEmerald">
+                            <span class="skin-preview-dot" style="background: #00FF87; box-shadow: 0 0 8px #00FF87;"></span>
+                            Emerald
+                        </button>
+                        <button class="skin-btn" data-skin="cyan" id="skinCyan">
+                            <span class="skin-preview-dot" style="background: #00E5FF; box-shadow: 0 0 8px #00E5FF;"></span>
+                            Cyan
+                        </button>
+                        <button class="skin-btn" data-skin="vaporwave" id="skinVaporwave">
+                            <span class="skin-preview-dot" style="background: #FF007F; box-shadow: 0 0 8px #FF007F;"></span>
+                            Vaporwave
+                        </button>
+                        <button class="skin-btn" data-skin="gold" id="skinGold">
+                            <span class="skin-preview-dot" style="background: #FFD700; box-shadow: 0 0 8px #FFD700;"></span>
+                            Dragon Gold
+                        </button>
+                        <button class="skin-btn" data-skin="chroma" id="skinChroma" style="grid-column: span 2;">
+                            <span class="skin-preview-dot" style="background: linear-gradient(45deg, red, yellow, lime, cyan, blue, magenta); box-shadow: 0 0 8px cyan;"></span>
+                            Rainbow Chroma (RGB)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CONTROLS CHEATSHEET -->
+                <div class="panel-card">
+                    <div class="panel-title"><span>🎮</span> Controls</div>
+                    <div class="controls-guide">
+                        <div class="control-row">
+                            <span>Move Direction</span>
+                            <span><span class="key-badge">W A S D</span> or <span class="key-badge">ARROWS</span></span>
+                        </div>
+                        <div class="control-row">
+                            <span>Pause / Resume</span>
+                            <span><span class="key-badge">P</span> or <span class="key-badge">SPACE</span></span>
+                        </div>
+                        <div class="control-row">
+                            <span>Toggle Sound FX</span>
+                            <span><span class="key-badge">M</span></span>
+                        </div>
+                        <div class="control-row">
+                            <span>Toggle Synth BGM</span>
+                            <span><span class="key-badge">B</span></span>
+                        </div>
+                        <div class="control-row">
+                            <span>Mobile / Tablet</span>
+                            <span>Swipe or Touch D-Pad</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+
+        <!-- VIRTUAL D-PAD FOR MOBILE & TOUCH SCREENS -->
+        <div class="dpad-container" id="virtualDpad">
+            <div class="dpad-grid">
+                <button class="dpad-btn up" data-dir="up" aria-label="Up">▲</button>
+                <button class="dpad-btn left" data-dir="left" aria-label="Left">◀</button>
+                <button class="dpad-btn down" data-dir="down" aria-label="Down">▼</button>
+                <button class="dpad-btn right" data-dir="right" aria-label="Right">▶</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT MODULES -->
+    <script src="js/audio.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/snake.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
